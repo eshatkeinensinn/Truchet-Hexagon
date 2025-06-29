@@ -59,15 +59,18 @@ class grid:
 
 
 class Hexagon:
-    def __init__(self, center_x, center_y, size, offset = 0):
+    def __init__(self, center_x, center_y, size, offset = 0, pattern = "none"):
         self.center_x = center_x
         self.center_y = center_y
         self.size = size
+        self.offset = offset
+        self.pattern = pattern
 
-        self.points, self.polygon = generate_hexagon_points(center_x, center_y, size, rotation_deg)
+        self.points, self.polygon = generate_hexagon_points(center_x, center_y, size)
 
-    def __repr__(self):
-        return f"Hexagon(center=({self.center_x}, {self.center_y}), size={self.size}, rotation={self.rotation_deg})" 
+        if pattern == "none":
+            self.pattern = random.choices(population=[1, 2, 3, 4, 5],weights=[100,100,100, 100, 100],k=1)[0]
+
 
 
 
