@@ -27,17 +27,18 @@ def generate_hexagon_points(center_x, center_y, size, rotation_deg=0):
 
 
 class Hexagon:
-    def __init__(self, center_x, center_y, size, offset = False, pattern = False, num = 5):
+    def __init__(self, center_x, center_y, size, id, offset = False, pattern = False, num = 5):
         self.center_x = center_x
         self.center_y = center_y
         self.center = (self.center_x, self.center_y)
         self.size = size
         self.num = num
-        
+        self.id = id  # ID as a list [row, column]
+
         if not offset:
             self.offset = random.randint(0, 5)
         else:
-            self.offset = offset
+            self.offset = 0
         
         self.points, self.polygon = generate_hexagon_points(center_x, center_y, size)
         self.draw_area = self.polygon
@@ -88,7 +89,6 @@ class Hexagon:
     def draw_curve(self, connection_single):
         connection_class = (connection_single[0]-connection_single[1]) % 6
         if connection_class == 1 or connection_class == 5:
-            print("Connection class is " + str(connection_class) )
             return self.curve_neighboring_edges(connection_single)
         elif connection_class == 2 or connection_class == 4:
             return self.curve_distant_edges(connection_single)
