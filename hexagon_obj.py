@@ -51,6 +51,8 @@ class grid:
             row_index += 1
 
 
+        #size of the grid in i and j direction
+        print(id)
 
         #self.draw_grid_one_colour()
 
@@ -181,16 +183,18 @@ class grid:
 
 
 
-#random.seed(32)
+
+random.seed(32)
 # Maße in mm
 a4_width_mm = 210
 a4_height_mm = 297
 offset_x = 0
 offset_y = 0
 margin_mm = 10
-hex_size = 10  # Außendurchmesser, ggf. in mm anpassen
+hex_size = 50  # Außendurchmesser, ggf. in mm anpassen
 x=8
 
 grid = grid(a4_width_mm, a4_height_mm, hex_size, offset_y=10)
 grid.connected_segments()
+#grid.draw_grid_one_colour()
 print("ggs")

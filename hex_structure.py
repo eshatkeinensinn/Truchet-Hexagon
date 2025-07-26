@@ -27,12 +27,12 @@ def generate_hexagon_points(center_x, center_y, size, rotation_deg=0):
 
 
 class Hexagon:
-    def __init__(self, center_x, center_y, size, id, offset = False, pattern = False, num = 5):
+    def __init__(self, center_x, center_y, size, id, offset = False, pattern = False, lines_per_segment = 5):
         self.center_x = center_x
         self.center_y = center_y
         self.center = (self.center_x, self.center_y)
         self.size = size
-        self.num = num
+        self.lines_per_segment = lines_per_segment
         self.id = id  # ID as a list [row, column]
 
         if not offset:
@@ -80,10 +80,12 @@ class Hexagon:
 
 
     def draw_curve_all(self):
-        curves = []
+        #Draw all Segments
+        
+        hexagon = []
         for connection in self.connection:
-            curves.append(self.draw_curve(connection))
-        return curves
+            hexagon.append(self.draw_curve(connection))
+        return hexagon
         
 
     def draw_curve(self, connection_single):
@@ -102,7 +104,7 @@ class Hexagon:
 
         curves = []
 
-        for i in np.linspace(0, 1, self.num):
+        for i in np.linspace(0, 1, self.lines_per_segment):
             p0 = self.lerp_np(self.points[(connection_single[0]+1)%6], self.points[(connection_single[0]+0)%6], i)
             p2 = self.lerp_np(self.points[(connection_single[1]+0)%6], self.points[(connection_single[1]+1)%6], i)
 
@@ -142,7 +144,7 @@ class Hexagon:
 
         curves = []
 
-        for i in np.linspace(0, 1, self.num):
+        for i in np.linspace(0, 1, self.lines_per_segment):
             p0 = self.lerp_np(self.points[(connection_single[0]+1)%6], self.points[(connection_single[0]+0)%6], i)
             p2 = self.lerp_np(self.points[(connection_single[1]+0)%6], self.points[(connection_single[1]+1)%6], i)
 
@@ -192,7 +194,7 @@ class Hexagon:
 
         curves = []
 
-        for i in np.linspace(0, 1, self.num):
+        for i in np.linspace(0, 1, self.lines_per_segment):
             p0 = self.lerp_np(self.points[(connection_single[0]+0)%6], self.points[(connection_single[0]+1)%6], i)
             p2 = self.lerp_np(self.points[(connection_single[1]+1)%6], self.points[(connection_single[1]+0)%6], i) 
 

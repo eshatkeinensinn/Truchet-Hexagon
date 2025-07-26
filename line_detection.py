@@ -3,27 +3,35 @@ import numpy as np
 from shapely.geometry import Polygon
 import hex_structure
 import random
+import copy
 
 
 class Line:
     """Class to represent a outer line in a hexagonal grid. For Example [14,2] with outer line 4."""
     def __init__(self, id, outer_line):
         self.id = id  # Hexagon ID
-        self.id_y = id[0]  # Y coordinate of the hexagon
-        self.id_x = id[1]  # X coordinate of the hexagon
+        self.id_y = id[1]  # Y coordinate of the hexagon
+        self.id_x = id[0]  # X coordinate of the hexagon
         self.outer_line = outer_line  # Connection index
+
+    def __repr__(self):
+        return f"Line(id={self.id}, outer_line={self.outer_line})"
 
 
 class Segment:
     """Class to represent a segment in a hexagonal grid. For Example [14,2] with outer lines [4, 5] as lines."""
     def __init__(self, id, connection):
         self.id = id  # Hexagon ID
-        self.id_y = id[0]  # Y coordinate of the hexagon
-        self.id_x = id[1]  # X coordinate of the hexagon
+        self.id_y = id[1]  # Y coordinate of the hexagon
+        self.id_x = id[0]  # X coordinate of the hexagon
         self.connection = connection  # Connection index
         self.outer_lines = []
         for i in connection:
             self.outer_lines.append(Line(id, i))
+
+    def __repr__(self):
+        return f"Segment(id={self.id}, connection={self.connection})"
+
 
 
 class Group:
@@ -38,6 +46,9 @@ class Group:
             self.open_ends.append(segment.outer_lines[0])  # Initialize with the first segment's outer line    
             self.open_ends.append(segment.outer_lines[1])  # Initialize with the second segment's outer line
 
+    def __repr__(self):
+        return f"Group(id={self.id}, segments={self.segments}, open_ends={self.open_ends})"
+        
     def add_segment(self, segment, new_end, old_end):
         """Add a segment to the group and update open ends."""
         self.segments.append(segment)
@@ -121,6 +132,7 @@ class detection_connected:
                     if result:
                         # If it connects to an open segment, add it to the group
                         # Add the segment to the existing group
+                        print(f"Adding Segment {new_segment.id} to Group {group.id}")
                         group.add_segment(new_segment, new_end, old_end)
                         place_found = True
                         break    
@@ -133,8 +145,13 @@ class detection_connected:
         
 
         # Number of groups found
-        print(f"Total Groups Found: {len(self.segment_group_list)}")        
+        print(f"Total Groups Found: {len(self.segment_group_list)}")     
 
+        # First Group
+        print(f"First Group: {self.segment_group_list[0]}")   
+
+        for group in self.segment_group_list:
+            print(group)
 
 
     def order_groups_lenght(self):
@@ -196,11 +213,11 @@ class detection_connected:
         while merged:
             
             #count the number of iterations
-            x += 1
             print(f"Iteration: {x}")
+            x += 1
 
 
-            unchecked_groups = self.segment_group_list.copy()  # Copy of the current segment group list
+            unchecked_groups = copy.deepcopy(self.segment_group_list)  # Copy of the current segment group list
             checked_groups = []  # List to hold groups that have been checked
             new_segment_group_list = []
 
@@ -213,8 +230,17 @@ class detection_connected:
                     for other_group in unchecked_groups:
                         if group != other_group and other_group not in checked_groups and group not in checked_groups:
                             merge, old_end, new_end = self.can_merge(group, other_group)
+                            print(merge)
                             if merge:
                                 # Merge groups
+                                
+                                # print group and old group
+                                print(f"Merging Group {group.id} with Group {other_group.id}")
+
+
+                                print(group)
+                                print(other_group)
+
                                 group.add_group(other_group, old_end, new_end)
                                 new_segment_group_list.append(group)
 
