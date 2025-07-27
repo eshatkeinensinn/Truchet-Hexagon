@@ -109,13 +109,13 @@ class _Segment:
         # Erzeuge die Kontur für das Clipping    
         contour = [self.points[(self.connection[0]+0)%6]]
 
-        control = self.lerp_np(self.lerp_np(self.points[(self.connection[0]+1)%6], self.points[(self.connection[1]+0)%6],0.5), self.center, (self.controllpoint-0.6)*1+ 0.3)
+        control = self.lerp_np(self.lerp_np(self.points[(self.connection[0]+1)%6], self.points[(self.connection[1]+0)%6],0.5), self.center, (self.controllpoint-0.6)*1+ self.margin)
         bezier_back = self.quadratic_bezier(self.points[(self.connection[0]+0)%6], control, self.points[(self.connection[1]+1)%6])
         contour += bezier_back[1:]
 
         contour += [self.points[(self.connection[1]+1)%6]]
 
-        control = self.lerp_np(self.lerp_np(self.points[(self.connection[0]+1)%6], self.points[(self.connection[1]+0)%6],0.5), self.center, (self.controllpoint-0.6)*0 + 0.3)
+        control = self.lerp_np(self.lerp_np(self.points[(self.connection[0]+1)%6], self.points[(self.connection[1]+0)%6],0.5), self.center, (self.controllpoint-0.6)*0 + 0.35)
         bezier_back = self.quadratic_bezier(self.points[(self.connection[1]+0)%6], control, self.points[(self.connection[0]+1)%6])
         contour += bezier_back[1:]
 

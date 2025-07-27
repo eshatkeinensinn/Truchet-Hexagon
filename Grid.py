@@ -9,7 +9,10 @@ from Colouring import _Colouring
 
 class _Grid():
 
-    def __init__(self, width, height, hex_size, offset_x = 10, offset_y = 0, lines_per_segment = 5, background=True, margin_width=10, margin_height=10):
+    def __init__(self, width, height, hex_size, offset_x = 10, offset_y = 0, lines_per_segment = 5, background=True, margin_width=10, margin_height=10, hexagon_margin=0.2):
+        """
+        Initialize a grid with the given parameters.
+        """
         self.width = width
         self.height = height
         self.offset_x = offset_x
@@ -19,6 +22,7 @@ class _Grid():
         self.background = background
         self.margin_width = margin_width
         self.margin_height = margin_height
+        self.hexagon_margin = hexagon_margin
 
         # hex_r_x horizontal length and hex_r_y the vertical
         self.hex_r_y = hex_size * math.sqrt(3) / 2
@@ -44,7 +48,7 @@ class _Grid():
 
             for j in np.arange(0 - self.offset_x + x_offset, self.width + self.hex_r_x, 3 * self.hex_r_x):
                 id = [round((j + self.offset_x - x_offset) / (3 * self.hex_r_x)),round((i + self.offset_y) / self.hex_r_y),]
-                hex = _Hexagon(j, i, self.hex_size,id, lines_per_segment=self.lines_per_segment)
+                hex = _Hexagon(j, i, self.hex_size,id, lines_per_segment=self.lines_per_segment, margin=self.hexagon_margin)
                 self.grid.append(hex)
 
 
@@ -102,7 +106,7 @@ class _Grid():
         if self.background:
             dwg.add(dwg.rect(insert=(0, 0), size=("100%", "100%"), fill="black"))
 
-        COLORS = ['red', 'green', 'blue', 'yellow', 'purple',
+        COLORS = ['seagreen', 'red', 'skyblue', 'white', 'purple',
         'orange', 'cyan', 'magenta', 'brown', 'gray', 'black']
 
 
@@ -170,7 +174,7 @@ class _Grid():
 
 
 
-random.seed(12456)
+random.seed(1256)
 # Maße in mm
 a4_width_mm = 210
 a4_height_mm = 297
@@ -180,7 +184,7 @@ margin_mm = 10
 hex_size = 20  # Außendurchmesser, ggf. in mm anpassen
 x=8
 
-grid = _Grid(a4_width_mm, a4_height_mm, hex_size, offset_y=10)
+grid = _Grid(a4_width_mm, a4_height_mm, hex_size, offset_y=10, background=True, hexagon_margin=0.15)
 grid.draw_grid_one_colour()
 grid.draw_grid_coloured()
 print("ggs")

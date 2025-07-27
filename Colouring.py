@@ -8,7 +8,7 @@ from Segment import _Segment
 from Group import _Group
 
 class _Colouring():
-    def __init__(self, grid, colour_count=4):
+    def __init__(self, grid, colour_count=5):
         
         self.grid = grid
         self.segment_group_list = []  # List to hold open group

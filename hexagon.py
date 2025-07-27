@@ -10,12 +10,16 @@ from Segment import _Segment
 
 
 class _Hexagon:
-    def __init__(self, center_x, center_y, size, id, offset = False, pattern = False, lines_per_segment = 5):
+    def __init__(self, center_x, center_y, size, id, offset = False, pattern = False, lines_per_segment = 5, margin=0.2):
+        """
+        Initialize a hexagon with the given parameters.
+        """
         self.center_x = center_x
         self.center_y = center_y
         self.center = (self.center_x, self.center_y)
         self.size = size
         self.lines_per_segment = lines_per_segment
+        self.margin = margin
         self.id = id  # ID as a list [row, column]
         self.id_x, self.id_y = id
         self.segments = []
@@ -55,7 +59,7 @@ class _Hexagon:
         # Create segments based on connections
         # Draw Area from Hexagon and Update it
         for connection in self.connection:
-            segment = _Segment(self.id, connection, self.center_x, self.center_y, self.size, self.draw_area, self.points, lines_per_segment=self.lines_per_segment)
+            segment = _Segment(self.id, connection, self.center_x, self.center_y, self.size, self.draw_area, self.points, lines_per_segment=self.lines_per_segment, margin=self.margin)
             self.draw_area = self.draw_area.difference(segment.get_erase_polygon())
             self.segments.append(segment)
 
