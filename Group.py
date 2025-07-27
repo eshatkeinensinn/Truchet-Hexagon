@@ -3,8 +3,6 @@ import svgwrite
 from shapely.geometry import Polygon, LineString, LinearRing
 import numpy as np
 import random
-import hex_structure
-import line_detection
 from Hexagon import _Hexagon
 from Segment import _Segment
 
