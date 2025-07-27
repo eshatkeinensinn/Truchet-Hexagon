@@ -5,6 +5,8 @@ import numpy as np
 import random
 import hex_structure
 import line_detection
+from Hexagon import _Hexagon
+from Colouring import _Colouring
 
 
 class _Grid():
@@ -43,8 +45,8 @@ class _Grid():
             x_offset = 0 if row_index % 2 == 0 else 1.5 * self.hex_r_x
 
             for j in np.arange(0 - self.offset_x + x_offset, self.width + self.hex_r_x, 3 * self.hex_r_x):
-                id = [round((i + self.offset_y) / self.hex_r_y), round((j + self.offset_x - x_offset) / (3 * self.hex_r_x))]
-                hex = hex_structure.Hexagon(j, i, self.hex_size,id, lines_per_segment=self.lines_per_segment)
+                id = [round((j + self.offset_x - x_offset) / (3 * self.hex_r_x)),round((i + self.offset_y) / self.hex_r_y),]
+                hex = _Hexagon(j, i, self.hex_size,id, lines_per_segment=self.lines_per_segment)
                 self.grid.append(hex)
 
 
@@ -52,7 +54,7 @@ class _Grid():
 
     #draw mode to get a svg with every segment in one colour
     def draw_grid_one_colour(self):
-        dwg = svgwrite.Drawing("hexagon_obj4.svg", size=("210mm", "297mm"), viewBox=f"0 0 {self.width} {self.height}")
+        dwg = svgwrite.Drawing("hexagon_one_colour.svg", size=("210mm", "297mm"), viewBox=f"0 0 {self.width} {self.height}")
         main_group = dwg.g()
 
         list_hexagon = []
@@ -63,7 +65,7 @@ class _Grid():
 
         #generation of lines(segments per hexagons, hexagons per grid)
         for hex in self.grid:
-            hexagon_lines = hex.draw_curve_all()
+            hexagon_lines = hex.get_curve_all()
             for segment_lines in hexagon_lines:
                 for line in segment_lines:
                     # Stelle sicher, dass `line` ein `LineString` ist
@@ -81,22 +83,106 @@ class _Grid():
                         elif intersection.geom_type == 'LineString':
                             main_group.add(svgwrite.shapes.Polyline(points=list(intersection.coords), stroke='white', fill='none', stroke_width=0.5))
 
+        #Add id of hexagon in center of hexagon
+        #for hexagon in self.grid:
+        #    center_x, center_y = hexagon.center
+        #    dwg.add(dwg.text(str(hexagon.id), insert=(center_x, center_y), fill='white', font_size='5px', text_anchor='middle'))
+
+
         dwg.add(main_group)
         dwg.save()
-        print("SVG gespeichert als hex_grid.svg")
 
 
-random.seed(32)
+    def draw_grid_coloured(self):
+        dwg = svgwrite.Drawing("hexagon_obj_coloured.svg", size=("210mm", "297mm"), viewBox=f"0 0 {self.width} {self.height}")
+        main_group = dwg.g()
+
+        colouring = _Colouring(grid.grid)
+        list_hexagon = []
+
+        # Background
+        if self.background:
+            dwg.add(dwg.rect(insert=(0, 0), size=("100%", "100%"), fill="black"))
+
+        COLORS = ['red', 'green', 'blue', 'yellow', 'purple',
+        'orange', 'cyan', 'magenta', 'brown', 'gray', 'black']
+
+
+
+        #generation of lines(segments per hexagons, hexagons per grid)
+        for id_val in range(0,11):
+            color = COLORS[id_val] if id_val < len(COLORS) else 'black'
+            for hex in self.grid:
+                hexagon_lines = hex.get_curve_colour(id_val)
+                for segment_lines in hexagon_lines:
+                    for line in segment_lines:
+                        # Stelle sicher, dass `line` ein `LineString` ist
+                        line_geom = LineString(line)
+                        # Führe die Schnittoperation durch
+                        intersection = line_geom.intersection(self.draw_area)
+                        
+                        # Wenn die Schnittstelle nicht leer ist, füge sie zu SVG hinzu
+                        if not intersection.is_empty:
+                            # Falls es sich um ein MultiLineString handelt, gehe alle Segmente durch
+                            if intersection.geom_type == 'MultiLineString':
+                                for seg in intersection.geoms:
+                                    main_group.add(svgwrite.shapes.Polyline(points=list(seg.coords), stroke=color, fill='none', stroke_width=0.5))
+                            # Falls es sich um einen LineString handelt, füge ihn direkt hinzu
+                            elif intersection.geom_type == 'LineString':
+                                main_group.add(svgwrite.shapes.Polyline(points=list(intersection.coords), stroke=color, fill='none', stroke_width=0.5))
+
+        dwg.add(main_group)
+        dwg.save()
+
+
+        # Save a seprate SVG for each colour group
+        for id_val in range(0,11):
+            color = COLORS[id_val] if id_val < len(COLORS) else 'black'
+            dwg = svgwrite.Drawing(f"hexagon_obj_coloured_{id_val}.svg", size=("210mm", "297mm"), viewBox=f"0 0 {self.width} {self.height}")
+            main_group = dwg.g()
+
+            # Background
+            if self.background:
+                dwg.add(dwg.rect(insert=(0, 0), size=("100%", "100%"), fill="black"))
+
+            for hex in self.grid:
+                hexagon_lines = hex.get_curve_colour(id_val)
+                for segment_lines in hexagon_lines:
+                    for line in segment_lines:
+                        # Stelle sicher, dass `line` ein `LineString` ist
+                        line_geom = LineString(line)
+                        # Führe die Schnittoperation durch
+                        intersection = line_geom.intersection(self.draw_area)
+                        
+                        # Wenn die Schnittstelle nicht leer ist, füge sie zu SVG hinzu
+                        if not intersection.is_empty:
+                            # Falls es sich um ein MultiLineString handelt, gehe alle Segmente durch
+                            if intersection.geom_type == 'MultiLineString':
+                                for seg in intersection.geoms:
+                                    main_group.add(svgwrite.shapes.Polyline(points=list(seg.coords), stroke=color, fill='none', stroke_width=0.5))
+                            # Falls es sich um einen LineString handelt, füge ihn direkt hinzu
+                            elif intersection.geom_type == 'LineString':
+                                main_group.add(svgwrite.shapes.Polyline(points=list(intersection.coords), stroke=color, fill='none', stroke_width=0.5))
+
+            # Check if the main group has any elements befor saving
+            if main_group.elements:
+                dwg.add(main_group)
+                dwg.save()
+
+
+
+
+random.seed(12456)
 # Maße in mm
 a4_width_mm = 210
 a4_height_mm = 297
 offset_x = 0
 offset_y = 0
 margin_mm = 10
-hex_size = 10  # Außendurchmesser, ggf. in mm anpassen
+hex_size = 20  # Außendurchmesser, ggf. in mm anpassen
 x=8
 
 grid = _Grid(a4_width_mm, a4_height_mm, hex_size, offset_y=10)
 grid.draw_grid_one_colour()
-#grid.draw_grid_one_colour()
+grid.draw_grid_coloured()
 print("ggs")
